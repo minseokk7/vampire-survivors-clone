@@ -101,19 +101,31 @@ function showLevelUpScreen(newLevel) {
     ui.levelUp.classList.add('active');
     ui.cardsContainer.innerHTML = '';
     
-    // Select 3 random options (or all if < 3)
-    const options = [...WEAPON_TYPES].sort(() => 0.5 - Math.random()).slice(0, 3);
+    // Filter out weapons that are already max level (5)
+    const availableOptions = WEAPON_TYPES.filter(opt => {
+        const currentWeapon = player.hasWeapon(opt.class) ? player.getWeapon(opt.class) : null;
+        return !currentWeapon || currentWeapon.level < 5;
+    });
+
+    if (availableOptions.length === 0) {
+        // Maxed out all possible items! Give a full heal and resume.
+        player.health = player.maxHealth;
+        if (typeof globalParticleSystem !== 'undefined') {
+            globalParticleSystem.emit(player.x, player.y, "#4caf50", 50, { speedMult: 2 });
+        }
+        ui.levelUp.classList.remove('active');
+        isPaused = false;
+        lastTime = performance.now();
+        requestAnimationFrame(gameLoop);
+        return;
+    }
+
+    // Select up to 3 random valid options
+    const options = [...availableOptions].sort(() => 0.5 - Math.random()).slice(0, 3);
     
     options.forEach(opt => {
         const isUpgrade = player.hasWeapon(opt.class);
         const currentWeapon = isUpgrade ? player.getWeapon(opt.class) : null;
-        
-        // Prevent upgrading past level 5
-        if (currentWeapon && currentWeapon.level >= 5) {
-            // Pick a different option or just return if no options left
-            // For simplicity, we just won't show maxed out cards
-            return;
-        }
 
         const nextLevel = isUpgrade ? currentWeapon.level + 1 : 1;
         
