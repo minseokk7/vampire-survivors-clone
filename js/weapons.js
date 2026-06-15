@@ -18,6 +18,12 @@ class Weapon {
     
     applyStats() {}
     
+    getDamage() {
+        // Global passive: +10% damage per player level
+        const mult = 1.0 + ((this.player.level - 1) * 0.1);
+        return this.damage * mult;
+    }
+    
     getClosestEnemies(enemies, count = 1, maxDist = Infinity) {
         return enemies
             .map(e => ({ enemy: e, distSq: (e.x - this.player.x)**2 + (e.y - this.player.y)**2 }))
@@ -99,7 +105,7 @@ class Fireball extends Weapon {
                 if (globalParticleSystem) globalParticleSystem.emit(p.x, p.y, "#ff5722", 20, { speedMult: 2 });
                 for (const enemy of enemies) {
                     if ((enemy.x - p.x)**2 + (enemy.y - p.y)**2 < this.aoeRadius**2) {
-                        enemy.takeDamage(this.damage);
+                        enemy.takeDamage(this.getDamage());
                         enemy.applyStatus("burn", 3);
                     }
                 }
@@ -109,7 +115,7 @@ class Fireball extends Weapon {
                         if (globalParticleSystem) globalParticleSystem.emit(p.x, p.y, "#f44336", 30, { speedMult: 3 });
                         for (const enemy of enemies) {
                             if ((enemy.x - p.x)**2 + (enemy.y - p.y)**2 < (this.aoeRadius * 1.2)**2) {
-                                enemy.takeDamage(this.damage * 0.5);
+                                enemy.takeDamage(this.getDamage() * 0.5);
                                 enemy.applyStatus("burn", 5);
                             }
                         }
@@ -176,7 +182,7 @@ class FlameStrike extends Weapon {
                     p.tick = 0.3; // tick damage
                     for (const enemy of enemies) {
                         if ((enemy.x - p.x)**2 + (enemy.y - p.y)**2 < this.radius**2) {
-                            enemy.takeDamage(this.damage);
+                            enemy.takeDamage(this.getDamage());
                             enemy.applyStatus("burn", 3);
                         }
                     }
@@ -241,7 +247,7 @@ class Meteor extends Weapon {
                 if (globalParticleSystem) globalParticleSystem.emit(m.targetX, m.targetY, "#ff5722", 50, { speedMult: 4 });
                 for (const enemy of enemies) {
                     if ((enemy.x - m.targetX)**2 + (enemy.y - m.targetY)**2 < this.radius**2) {
-                        enemy.takeDamage(this.damage);
+                        enemy.takeDamage(this.getDamage());
                         enemy.applyStatus("burn", 5);
                     }
                 }
@@ -290,7 +296,7 @@ class IceOrb extends Weapon {
 
             for (const enemy of enemies) {
                 if ((enemy.x - x)**2 + (enemy.y - y)**2 < (enemy.radius + this.radius)**2) {
-                    enemy.takeDamage(this.damage * dt * 5); 
+                    enemy.takeDamage(this.getDamage() * dt * 5); 
                     enemy.applyStatus("slow", 3);
                 }
             }
@@ -343,7 +349,7 @@ class FrostNova extends Weapon {
             for (const enemy of enemies) {
                 const dist = Math.sqrt((enemy.x - n.x)**2 + (enemy.y - n.y)**2);
                 if (dist > prevRadius && dist <= n.radius) {
-                    enemy.takeDamage(this.damage);
+                    enemy.takeDamage(this.getDamage());
                     enemy.applyStatus("slow", 3);
                     if (this.level >= 5) enemy.applyStatus("shock", 1.5); // Deep Freeze
                 }
@@ -394,7 +400,7 @@ class Blizzard extends Weapon {
                 f.tickTimer = 0.5;
                 for (const enemy of enemies) {
                     if ((enemy.x - f.x)**2 + (enemy.y - f.y)**2 < this.radius**2) {
-                        enemy.takeDamage(this.damage);
+                        enemy.takeDamage(this.getDamage());
                         enemy.applyStatus("slow", 3);
                     }
                 }
@@ -432,7 +438,7 @@ class LightningStrike extends Weapon {
         if (this.cooldownTimer <= 0 && enemies.length > 0) {
             const targets = this.getClosestEnemies(enemies, this.targetCount, 400);
             for (const target of targets) {
-                target.takeDamage(this.damage);
+                target.takeDamage(this.getDamage());
                 target.applyStatus("shock", 1);
                 this.strikes.push({x: target.x, y: target.y, life: 0.2});
                 
@@ -457,7 +463,7 @@ class LightningStrike extends Weapon {
                 g.tick = 0.5;
                 for (const enemy of enemies) {
                     if ((enemy.x - g.x)**2 + (enemy.y - g.y)**2 < 50**2) {
-                        enemy.takeDamage(this.damage * 0.2);
+                        enemy.takeDamage(this.getDamage() * 0.2);
                         enemy.applyStatus("shock", 0.5);
                     }
                 }
@@ -503,7 +509,7 @@ class ChainLightning extends Weapon {
                 let hitEnemies = new Set([current]);
 
                 while (current && remainingBounces > 0) {
-                    current.takeDamage(this.damage);
+                    current.takeDamage(this.getDamage());
                     current.applyStatus("shock", 1);
                     chainPoints.push({x: current.x, y: current.y});
                     remainingBounces--;
@@ -566,7 +572,7 @@ class Thunderstorm extends Weapon {
             for(let i=0; i<this.zapCount && inRange.length > 0; i++) {
                 const idx = Math.floor(Math.random() * inRange.length);
                 const target = inRange.splice(idx, 1)[0]; // remove so we don't zap same twice in one tick
-                target.takeDamage(this.damage);
+                target.takeDamage(this.getDamage());
                 target.applyStatus("shock", 1);
                 this.zaps.push({x: target.x, y: target.y, life: 0.2});
             }

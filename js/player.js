@@ -6,12 +6,15 @@ class Player {
         this.vy = 0;
         
         // Base Stats
+        this.level = 1;
         this.speed = 200; // pixels per second
         this.speedMult = 1.0; // Modified by passives
         this.maxHealth = 100;
         this.health = this.maxHealth;
         this.radius = 15;
-        this.pickupRadius = 60;
+        this.basePickupRadius = 60;
+        this.magnetBuffTimer = 0;
+        this.damageFlashTimer = 0;
         
         // State
         this.weapons = [];
@@ -60,8 +63,7 @@ class Player {
         if (this.isDead) return;
         
         this.health -= amount;
-        
-        // Flash effect could be added here
+        this.damageFlashTimer = 0.2;
         
         if (this.health <= 0) {
             this.health = 0;
@@ -69,8 +71,24 @@ class Player {
         }
     }
 
+    getPickupRadius() {
+        return this.magnetBuffTimer > 0 ? 800 : this.basePickupRadius;
+    }
+
     update(dt, boundaries) {
         if (this.isDead) return;
+
+        if (this.damageFlashTimer > 0) {
+            this.damageFlashTimer -= dt;
+        }
+
+        if (this.magnetBuffTimer > 0) {
+            this.magnetBuffTimer -= dt;
+            // Emit some magnetic particles occasionally
+            if (typeof globalParticleSystem !== 'undefined' && Math.random() < 0.1) {
+                globalParticleSystem.emit(this.x, this.y, "#9c27b0", 1, { speedMult: 0.5 });
+            }
+        }
 
         // Calculate movement vector
         let moveX = 0;
@@ -109,6 +127,15 @@ class Player {
         const renderY = this.y - cameraY;
 
         ctx.save();
+        
+        // Magnetic Aura if buffed
+        if (this.magnetBuffTimer > 0) {
+            ctx.beginPath();
+            ctx.arc(renderX, renderY, this.basePickupRadius * 1.5, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(156, 39, 176, ${0.3 + Math.sin(Date.now()*0.01)*0.2})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
         
         // Draw shadow
         ctx.fillStyle = "rgba(0,0,0,0.4)";

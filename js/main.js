@@ -211,7 +211,11 @@ function gameLoop(currentTime) {
 
         player.weapons.forEach(w => w.update(dt, enemyManager.enemies));
         enemyManager.update(dt, player, expManager);
-        expManager.update(dt, player, showLevelUpScreen);
+        expManager.update(dt, player, (newLevel) => {
+            player.level = newLevel; // Sync for global damage scaling
+            isPaused = true;
+            showLevelUpScreen(newLevel);
+        });
         globalParticleSystem.update(dt);
         
         // Update Camera

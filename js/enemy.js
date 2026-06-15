@@ -48,6 +48,7 @@ class Enemy {
                 this.expReward = 3;
                 break;
         }
+        this.expReward = Math.max(1, Math.floor(this.expReward * hpScale));
         this.health = this.maxHealth;
     }
 
@@ -354,6 +355,9 @@ class EnemyManager {
 
             if (enemy.isDead) {
                 expManager.spawnGem(enemy.x, enemy.y, enemy.expReward);
+                if (Math.random() < 0.01) { // 1% drop rate for magnet
+                    expManager.spawnItem(enemy.x, enemy.y + 20, "magnet");
+                }
                 if (globalParticleSystem) {
                     globalParticleSystem.emit(enemy.x, enemy.y, enemy.color, 15, { speedMult: 1.5 });
                 }
