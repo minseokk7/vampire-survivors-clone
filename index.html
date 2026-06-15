@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vampire Survivors Clone</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- UI Overlay -->
+        <div id="ui-layer">
+            <div id="top-bar">
+                <div class="exp-bar-container">
+                    <div id="exp-bar-fill"></div>
+                </div>
+                <div id="level-display">LV <span id="level-text">1</span></div>
+                <div id="time-display">00:00</div>
+            </div>
+            
+            <div id="health-bar-container">
+                <div id="health-bar-fill"></div>
+            </div>
+
+            <!-- Boss UI -->
+            <div id="boss-ui" style="display: none;">
+                <div id="boss-name">VAMPIRE LORD</div>
+                <div id="boss-hp-container">
+                    <div id="boss-hp-fill"></div>
+                </div>
+            </div>
+
+            <!-- Main Menu -->
+            <div id="main-menu" class="screen active">
+                <h1>VAMPIRE SURVIVORS</h1>
+                <p>WASD or Arrow Keys to move. Auto attack.</p>
+                <button id="start-btn">START GAME</button>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="game-over-screen" class="screen">
+                <h1>GAME OVER</h1>
+                <p>Survived Time: <span id="final-time">00:00</span></p>
+                <p>Level Reached: <span id="final-level">1</span></p>
+                <button id="restart-btn">TRY AGAIN</button>
+            </div>
+
+            <!-- Level Up Screen -->
+            <div id="level-up-screen" class="screen">
+                <h2>LEVEL UP!</h2>
+                <div id="upgrade-cards-container">
+                    <!-- Cards will be injected via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/particles.js"></script>
+    <script src="js/experience.js"></script>
+    <script src="js/weapons.js"></script>
+    <script src="js/enemy.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
