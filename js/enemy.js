@@ -326,6 +326,7 @@ class EnemyManager {
         this.spawnTimer = 0;
         this.gameMinutes = 0;
         this.bossSpawned = false;
+        this.killCount = 0;
     }
 
     update(dt, player, expManager) {
@@ -355,9 +356,13 @@ class EnemyManager {
 
             if (enemy.isDead) {
                 expManager.spawnGem(enemy.x, enemy.y, enemy.expReward);
-                if (Math.random() < 0.05) { // 5% drop rate for magnet
+                this.killCount++;
+                
+                // Guaranteed drop every 25 kills OR 3% random chance
+                if (this.killCount % 25 === 0 || Math.random() < 0.03) {
                     expManager.spawnItem(enemy.x, enemy.y + 20, "magnet");
                 }
+                
                 if (globalParticleSystem) {
                     globalParticleSystem.emit(enemy.x, enemy.y, enemy.color, 15, { speedMult: 1.5 });
                 }
