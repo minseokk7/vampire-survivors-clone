@@ -355,7 +355,7 @@ class EnemyManager {
 
             if (enemy.isDead) {
                 expManager.spawnGem(enemy.x, enemy.y, enemy.expReward);
-                if (Math.random() < 0.01) { // 1% drop rate for magnet
+                if (Math.random() < 0.05) { // 5% drop rate for magnet
                     expManager.spawnItem(enemy.x, enemy.y + 20, "magnet");
                 }
                 if (globalParticleSystem) {
